@@ -2550,6 +2550,10 @@ static int valid_cached_dir(struct dir_struct *dir,
 	if (untracked->check_only != !!check_only)
 		return 0;
 
+	/* fsmonitor already confirmed this directory is unchanged */
+	if (dir->untracked->use_fsmonitor && untracked->valid)
+		return 1;
+
 	/*
 	 * prep_exclude will be called eventually on this directory,
 	 * but it's called much later in last_matching_pattern(). We
