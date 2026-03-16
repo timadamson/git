@@ -50,11 +50,11 @@ struct repo_settings {
 	int read_replace_refs;
 
 	struct fsmonitor_settings *fsmonitor; /* lazily loaded */
-	int untracked_cache_skip_validation;
 
 	int index_version;
 	int index_skip_hash;
 	enum untracked_cache_setting core_untracked_cache;
+	int untracked_cache_skip_validation;
 
 	int pack_use_sparse;
 	int pack_use_path_walk;
