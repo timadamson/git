@@ -2552,35 +2552,14 @@ static int valid_cached_dir(struct dir_struct *dir,
 
 	/*
 	 * When fsmonitor is active and confirms this directory is
-	 * unchanged, we can skip the prep_exclude() call below that
-	 * would otherwise open, read, and hash the .gitignore file
-	 * only to confirm the OID hasn't changed.
-	 *
-	 * This is safe because the three exclude sources are each
-	 * validated before we get here:
-	 *
-	 *  - core.excludesFile and .git/info/exclude are checked in
-	 *    validate_untracked_cache(), which invalidates the entire
-	 *    tree (via invalidate_gitignore) before traversal begins.
-	 *
-	 *  - Per-directory .gitignore changes are reported by fsmonitor,
-	 *    which invalidates the containing directory (valid = 0).
-	 *    When prep_exclude() later runs for that directory, it
-	 *    detects the OID mismatch and calls invalidate_gitignore()
-	 *    to cascade valid = 0 to all descendants.
-	 *
-	 * The descendant cascade relies on read_directory_recursive()
-	 * always processing a parent before its children, so that the
-	 * parent's prep_exclude() has already invalidated us if a
-	 * .gitignore anywhere above changed.
-	 *
-	 * Exclude patterns are still loaded lazily by prep_exclude()
-	 * when actually needed (e.g. for files in invalidated child
-	 * directories).
+	 * unchanged, and core.untrackedCacheSkipValidation is set,
+	 * skip the expensive prep_exclude() call that would otherwise
+	 * open, read, and hash exclude files along the path only to
+	 * confirm the cached OID hasn't changed.
 	 */
 	if (dir->untracked->use_fsmonitor && untracked->valid) {
 		prepare_repo_settings(istate->repo);
-		if (istate->repo->settings.fsmonitor_skip_gitignore_revalidation)
+		if (istate->repo->settings.untracked_cache_skip_validation)
 			return 1;
 	}
 

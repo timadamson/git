@@ -492,7 +492,7 @@ test_expect_success UNTRACKED_CACHE 'fsmonitor valid dirs skip re-validation' '
 		printf "last_update_token\0"
 		EOF
 		git config core.fsmonitor .git/hooks/fsmonitor-test &&
-		git config core.fsmonitorSkipGitignoreRevalidation true &&
+		git config core.untrackedCacheSkipValidation true &&
 		git update-index --untracked-cache &&
 		git update-index --fsmonitor &&
 
