@@ -50,6 +50,7 @@ struct repo_settings {
 	int read_replace_refs;
 
 	struct fsmonitor_settings *fsmonitor; /* lazily loaded */
+	int fsmonitor_skip_gitignore_revalidation;
 
 	int index_version;
 	int index_skip_hash;

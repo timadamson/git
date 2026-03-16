@@ -2550,9 +2550,18 @@ static int valid_cached_dir(struct dir_struct *dir,
 	if (untracked->check_only != !!check_only)
 		return 0;
 
-	/* fsmonitor already confirmed this directory is unchanged */
-	if (dir->untracked->use_fsmonitor && untracked->valid)
-		return 1;
+	/*
+	 * If fsmonitor already confirmed this directory is unchanged and
+	 * core.fsmonitorSkipGitignoreRevalidation is set, skip the
+	 * expensive prep_exclude() call that would re-read .gitignore
+	 * files along the path only to confirm the cached OID is still
+	 * valid.
+	 */
+	if (dir->untracked->use_fsmonitor && untracked->valid) {
+		prepare_repo_settings(istate->repo);
+		if (istate->repo->settings.fsmonitor_skip_gitignore_revalidation)
+			return 1;
+	}
 
 	/*
 	 * prep_exclude will be called eventually on this directory,
